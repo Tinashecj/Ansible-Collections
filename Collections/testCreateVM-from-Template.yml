@@ -1,0 +1,55 @@
+---
+- name: Create a VM from Template
+  hosts: localhost
+  gather_facts: no
+  tasks:
+  - set_fact:
+        vm_name: "{{ vm_name }}"
+        vm_datacenter: "{{ vm_datacenter }}"
+        vcenter_server: "{{ vcenter_server }}"
+        vm_datastore1: "{{ vm_datastore1 }}"
+        vm_datastore2: "{{ vm_datastore2 }}"
+        vcenter_cluster: "{{ vcenter_cluster }}"
+        vcenter_user: "{{ vcenter_user }}"
+        vcenter_pass: "{{ vcenter_pass }}"
+        vm_template: "{{ vm_to_template }}"
+
+  - name: Clone a VM from template
+    vmware_guest:
+      hostname: "{{ vcenter_server }}"
+      username: "{{ vcenter_user }}"
+      password: "{{ vcenter_pass }}"
+      validate_certs: False
+      name: "{{ vm_name }}"
+      template: "{{ vm_template }}"
+      datacenter: "{{ vm_datacenter }}"
+      guest_id: "centos7_64Guest"
+      disk:
+      - datastore : "{{ vm_datastore1 }}"
+        size_gb: 1
+        type: thin
+        controller_type: paravirtual
+        controller_number: 0
+        unit_number: 0
+      - datastore : "{{ vm_datastore2 }}"
+        size_gb: 1
+        type: thin
+        controller_type: paravirtual
+        controller_number: 0
+        unit_number: 1
+      - datastore : "{{ vm_datastore2 }}"
+        size_gb: 1
+        type: thin
+        controller_type: paravirtual
+        controller_number: 0
+        unit_number: 2
+      - datastore : "{{ vm_datastore1 }}"
+        size_gb: 1
+        type: thin
+        controller_type: paravirtual
+        controller_number: 0
+        unit_number: 3
+      folder: /
+      state: "present"
+      cluster: "{{ vcenter_cluster }}"
+      wait_for_ip_address: no
